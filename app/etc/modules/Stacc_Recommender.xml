@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Stacc_Recommender>
+            <active>true</active>
+            <codePool>community</codePool>
+        </Stacc_Recommender>
+    </modules>
+</config>

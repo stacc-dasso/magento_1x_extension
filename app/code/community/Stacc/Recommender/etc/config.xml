@@ -1,0 +1,141 @@
+<?xml version="1.0" ?>
+<config>
+    <modules>
+        <Stacc_Recommender>
+            <version>3.7.1</version>
+        </Stacc_Recommender>
+    </modules>
+
+    <!-- This node contains parameters, available on frontend -->
+    <frontend>
+        <!-- Module aliases are located in this block -->
+        <routers>
+            <!-- This node's name should be the same as our alias -->
+            <recommender>
+                <!-- use parameter specifies which of basic routers needs to be used.
+                This can be "standard" for frontend or "admin" for backend -->
+                <use>standard</use>
+                <!-- router arguments block -->
+                <args>
+                    <!-- This parameter specifies the full name of out module -->
+                    <module>Stacc_Recommender</module>
+                    <!-- This parameter sets module alias -->
+                    <frontName>recommender</frontName>
+                </args>
+            </recommender>
+        </routers>
+        <!-- File to get translations from -->
+        <translate>
+            <modules>
+                <recommender>
+                    <files>
+                        <default>Stacc_Recommender.csv</default>
+                    </files>
+                </recommender>
+            </modules>
+        </translate>
+        <!-- File where to Get the layout -->
+        <layout>
+            <updates>
+                <recommender>
+                    <file>stacc_recommender.xml</file>
+                </recommender>
+            </updates>
+        </layout>
+    </frontend>
+
+    <global>
+
+        <!-- Define locations for Block Classes -->
+        <blocks>
+            <recommender>
+                <class>Stacc_Recommender_Block</class>
+            </recommender>
+        </blocks>
+
+        <!-- Define location for Model Classes -->
+        <models>
+            <recommender>
+                <class>Stacc_Recommender_Model</class>
+            </recommender>
+        </models>
+        <!--  Define location for Helper Classes -->
+        <helpers>
+            <recommender>
+                <class>Stacc_Recommender_Helper</class>
+            </recommender>
+        </helpers>
+
+        <!--Event listeners-->
+        <events>
+
+            <!--Add product to a cart Observer class-->
+            <checkout_cart_add_product_complete>
+                <observers>
+                    <stacc_recommender_model_observer_add_to_cart>
+                        <type>singleton</type>
+                        <class>recommender/observer_cart</class>
+                        <method>observe</method>
+                    </stacc_recommender_model_observer_add_to_cart>
+                </observers>
+            </checkout_cart_add_product_complete>
+
+            <!--Catalog Search Observer class-->
+            <controller_action_postdispatch_catalogsearch_result_index>
+                <observers>
+                    <stacc_recommender_model_observer_search>
+                        <type>singleton</type>
+                        <class>recommender/observer_search</class>
+                        <method>observe</method>
+                    </stacc_recommender_model_observer_search>
+                </observers>
+            </controller_action_postdispatch_catalogsearch_result_index>
+
+            <!--Order placed/Purchased Observer class-->
+            <sales_order_place_after>
+                <observers>
+                    <stacc_recommender_model_observer_purchase>
+                        <type>singleton</type>
+                        <class>recommender/observer_purchase</class>
+                        <method>observe</method>
+                    </stacc_recommender_model_observer_purchase>
+                </observers>
+            </sales_order_place_after>
+
+            <!-- View Observer class -->
+            <catalog_controller_product_view>
+                <observers>
+                    <stacc_recommender_model_observer_view>
+                        <type>singleton</type>
+                        <class>recommender/observer_view</class>
+                        <method>observe</method>
+                    </stacc_recommender_model_observer_view>
+                </observers>
+            </catalog_controller_product_view>
+
+            <!-- Config Save Observer class -->
+            <admin_system_config_changed_section_stacc_recommender>
+                <observers>
+                    <stacc_recommender_model_observer_config>
+                        <type>singleton</type>
+                        <class>recommender/observer_config</class>
+                        <method>observe</method>
+                    </stacc_recommender_model_observer_config>
+                </observers>
+            </admin_system_config_changed_section_stacc_recommender>
+        </events>
+    </global>
+
+    <!-- Admin side translations -->
+    <adminhtml>
+        <translate>
+            <modules>
+                <Stacc_Recommender>
+                    <files>
+                        <default>Stacc_Recommender.csv</default>
+                    </files>
+                </Stacc_Recommender>
+            </modules>
+        </translate>
+    </adminhtml>
+</config>

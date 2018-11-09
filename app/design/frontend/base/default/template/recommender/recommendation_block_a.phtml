@@ -1,0 +1,40 @@
+<?php if (count($this->getRecommendations())): ?>
+    <div class="stacc_recommender_recommendations_1"
+         data-lang="<?php echo Mage::app()->getLocale()->getLocaleCode() ?>" data-stacc-block-time="<?php echo $this->getTimestamp();?>">
+        <h2><?php echo $this->__('Our recommended products') ?></h2>
+        <ul class="stacc_recommender_col stacc_recommender_slider">
+            <?php foreach ($this->getRecommendations() as $_link): ?>
+                <li class="stacc_recommender_item">
+                    <a href="<?php echo $_link->getProductUrl() ?>"
+                       title="<?php echo $this->escapeHtml($_link->getName()) ?>"
+                       class="stacc_recommender_product_image">
+                        <img src="<?php echo $this->helper('catalog/image')->init($_link, 'small_image')->resize(280) ?>"
+                             alt="<?php echo $this->escapeHtml($_link->getName()) ?>"/>
+                    </a>
+                    <h3 class="stacc_recommender_product_name">
+                        <a href="<?php echo $_link->getProductUrl() ?>"
+                           title="<?php echo $this->escapeHtml($_link->getName()) ?>">
+                            <?php echo $this->escapeHtml($_link->getName()) ?>
+                        </a>
+                    </h3>
+
+                    <?php echo $this->getPriceHtml($_link, true, '-stacc_recommender') ?>
+                    <?php echo $this->getReviewsSummaryHtml($_link) ?>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+        <div class="stacc_recommender_controls">
+            <div class="stacc_left_control">
+                <div class="arrow">
+
+                </div>
+            </div>
+            <div class="stacc_right_control">
+                <div class="arrow">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+<?php endif ?>

@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<config>
+    <tabs>
+        <stacc_recommender translate="label">
+            <label>STACC Recommender</label>
+            <sort_order>1</sort_order>
+        </stacc_recommender>
+    </tabs>
+    <sections>
+        <stacc_recommender translate="label">
+            <label>Configuration</label>
+            <tab>stacc_recommender</tab>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <stacc_recommender translate="label">
+                    <label>Recommender Configuration</label>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <stacc_shop_id translate="label">
+                            <label>STACC Shop ID</label>
+                            <sort_order>1</sort_order>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </stacc_shop_id>
+                        <stacc_api_key translate="label">
+                            <label>STACC API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </stacc_api_key>
+                        <stacc_version translate="label">
+                            <label>Recommender Extension Version</label>
+                            <frontend_type>select</frontend_type>
+                            <frontend_model>recommender/adminhtml_version</frontend_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </stacc_version>
+                    </fields>
+                </stacc_recommender>
+            </groups>
+        </stacc_recommender>
+    </sections>
+</config>

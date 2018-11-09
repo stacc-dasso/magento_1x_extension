@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<layout>
+    <default><!-- Neccessary CSS and JS for the extension -->
+
+        <reference name="head">
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>js/Stacc/Recommender/tiny-slider.min.js</name>
+            </action>
+        </reference>
+
+        <reference name="head">
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>js/Stacc/Recommender/Recommender.js</name>
+            </action>
+        </reference>
+
+        <reference name="head">
+            <action method="addItem">
+                <type>skin_css</type>
+                <name>css/Stacc/Recommender/tiny-slider.css</name>
+            </action>
+        </reference>
+
+        <reference name="head">
+            <action method="addItem">
+                <type>skin_css</type>
+                <name>css/Stacc/Recommender/Recommender.css</name>
+            </action>
+        </reference>
+
+    </default>
+
+    <!-- Define STACC Recommender Block to display -->
+    <catalog_product_view>
+        <reference name="content">
+            <block type="recommender/container" name="stacc.recommender.product" after=""
+                   template="recommender/container.phtml">
+                <action method="setRecommendationTemplate">
+                    <template>recommender/recommendation_block_a.phtml</template>
+                </action>
+                <action method="setElementId">
+                    <blockId>stacc_product_default</blockId>
+                </action>
+                <action method="setCacheLifetime"></action>
+            </block>
+        </reference>
+    </catalog_product_view>
+</layout>
