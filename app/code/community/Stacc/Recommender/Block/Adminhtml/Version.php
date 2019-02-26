@@ -30,12 +30,19 @@ class Stacc_Recommender_Block_Adminhtml_Version extends Mage_Adminhtml_Block_Sys
             $apiKey = $environment->getApiKey();
             $shopID = $environment->getClientId();
 
+            $defaultCode = Mage::app()->getDefaultStoreView()->getCode();
+            $defaultUrl = Mage::getUrl('', array(
+                '_store' => $defaultCode
+            ));
+
             if ($apiKey && $shopID) {
                 $data = [
                     "media_url" => Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . "catalog/product/",
                     "js" => Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS),
                     "skins" => Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN),
-                    "base_url" => Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB)
+                    "base_url" => Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB),
+                    "direct_link" => Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_DIRECT_LINK),
+                    "default_store" => $defaultUrl
                 ];
                 $request = Mage::helper('recommender/apiclient')->sendCheckCredentials($data);
 

@@ -1,5 +1,6 @@
 <?php
 
+
 /**
  * Model Class for Product Syncing
  *
@@ -89,10 +90,11 @@ class Stacc_Recommender_Model_Sync extends Mage_Core_Model_Abstract
         Stacc_Recommender_Helper_Logger $logger = null,
         Stacc_Recommender_Helper_Apiclient $apiclient = null)
     {
-        $this->_app =  is_array($app)||is_null($app) ? Mage::app() : $app;
+        $this->_app = is_array($app) || is_null($app) ? Mage::app() : $app;
         $this->_environment = is_null($environment) ? Mage::helper('recommender/environment') : $environment;
         $this->_logger = is_null($logger) ? Mage::helper('recommender/logger') : $logger;
         $this->_apiclient = is_null($apiclient) ? Mage::helper('recommender/apiclient') : $apiclient;
+
     }
 
     /**
@@ -103,6 +105,7 @@ class Stacc_Recommender_Model_Sync extends Mage_Core_Model_Abstract
      */
     public function syncProducts($storeId = null)
     {
+
         $syncData = array("errors" => 0, "transmitted" => 0, "count" => 0, "pages" => 0);
 
         try {
@@ -304,6 +307,7 @@ class Stacc_Recommender_Model_Sync extends Mage_Core_Model_Abstract
     {
         return $this->_storeCodes;
     }
+
     /**
      * Maps Web Id to the WebIdNames Array
      *
@@ -458,6 +462,7 @@ class Stacc_Recommender_Model_Sync extends Mage_Core_Model_Abstract
                     'product_id=entity_id',
                     null,
                     'left')
+                ->setOrder('product_id')
                 ->setPageSize($this->getProductsPerPage())
                 ->setCurPage($this->getCurrentPage());
 
@@ -467,6 +472,51 @@ class Stacc_Recommender_Model_Sync extends Mage_Core_Model_Abstract
             Mage::helper('recommender/logger')->logCritical("Model/Sync->getProductsCollection() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
             return array();
         }
+    }
+
+    public function getAmountOfPages($storeId = null)
+    {
+        $this->setStoreId($storeId);
+        if ($this->getProductsCollection()) {
+            return ["products_amount" => $this->getProductsCollection()->getSize(), "per_page" => $this->getProductsPerPage(), "amount_of_pages" => $this->getProductsCollection()->getLastPageNumber()];
+        }
+        return false;
+    }
+
+    public function syncAPage($page, $storeId = null)
+    {
+        $transmitted = 0;
+        $errors = 0;
+        $this->initSync($storeId);
+        $this->setCurrentPage($page);
+        $products = $this->getProductsCollection();
+        $dataBulk = $this->getModifiedProductsAsBulk($products);
+        $amount = count($dataBulk);
+        $data_json = array(
+            "bulk" => $dataBulk,
+            "properties" => [
+                "current_page" => $page,
+                "total_pages" => 1,
+                "amount_of_products" => $amount,
+                "extension_version" => $this->getEnvironment()->getVersion(),
+                "store" => $this->getStoreId()
+            ]);
+        $syncResponse = $this->getApiclient()->sendProducts($data_json);
+        if ($syncResponse != "{}") {
+            $errors += 1;
+            $this->_logger->logError("Can't send products", ['error' => strval($syncResponse)]);
+        } else {
+            $transmitted = $amount;
+        }
+        $this->response["data"] = ["total" => $amount, "transmitted" => $transmitted];
+
+        $this->setEndTime(microtime(true));
+
+        $sync_time = $this->getEndTime() - $this->getStartTime();
+
+        $this->_logger->logNotice("Synchronization finished, took $sync_time seconds, transmitted " . $transmitted . "/" . $amount . " products, " . $errors . " errors");
+
+        return array("errors" => $errors, "transmitted" => $transmitted, "count" => $amount, "pages" => 1);
     }
 
     /**
@@ -480,6 +530,7 @@ class Stacc_Recommender_Model_Sync extends Mage_Core_Model_Abstract
         $dataBulk = array();
 
         try {
+            $count = 0;
             foreach ($productCollection as $product) {
 
                 $version = $this->getEnvironment()->getVersion();
@@ -490,10 +541,10 @@ class Stacc_Recommender_Model_Sync extends Mage_Core_Model_Abstract
                 $categoryNames = $this->generateCategoryList($product->getCategoryIds());
                 $storeData = $this->generateStores($product);
 
-
                 // Build product structure to send
                 $newProduct = array(
-                    'item_id' => $productId, 'name' => $product->getName(),
+                    'item_id' => $productId,
+                    'name' => $product->getName(),
                     'price' => $product->getPrice(),
                     'currency' => Mage::helper('recommender/environment')->getCurrencyCode(),
                     'stores' => $this->getStoreCodes(),

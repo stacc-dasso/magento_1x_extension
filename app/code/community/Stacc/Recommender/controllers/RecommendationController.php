@@ -121,6 +121,7 @@ class Stacc_Recommender_RecommendationController extends Mage_Core_Controller_Fr
     public function syncAction()
     {
         try {
+            set_time_limit(300);
             $urlHash = (string)$this->getRequest()->getParam('h');
             $timestamp = $this->getRequest()->getParam('t');
 
@@ -140,16 +141,61 @@ class Stacc_Recommender_RecommendationController extends Mage_Core_Controller_Fr
         }
     }
 
+    public function sheetAction()
+    {
+        try {
+            set_time_limit(300);
+            $urlHash = (string)$this->getRequest()->getParam('h');
+            $timestamp = $this->getRequest()->getParam('t');
+
+            $storeId = $this->verifyId($this->getRequest()->getParam('s'), $this::TYPE_STORE);
+            $page = $this->getRequest()->getParam('pg');
+
+            if ($this->auth_api($urlHash)) {
+
+                $syncPage = Mage::getModel('recommender/sync', Mage::app())->syncAPage($page, $storeId);
+                $this->getResponse()->setBody(json_encode(array_merge($syncPage,['timestamp'=>$timestamp])));
+            } else {
+                Mage::helper('recommender/logger')->logError("Failed to authenticate the request");
+                $this->getResponse()->setBody("");
+            }
+        } catch (Exception $exception) {
+            Mage::helper('recommender/logger')->logCritical("controllers/RecommendationController->sheetAction() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            return null;
+        }
+    }
+
+    public function pagesAction()
+    {
+        try {
+            $urlHash = (string)$this->getRequest()->getParam('h');
+            $timestamp = $this->getRequest()->getParam('t');
+
+            $storeId = $this->verifyId($this->getRequest()->getParam('s'), $this::TYPE_STORE);
+            if ($this->auth_api($urlHash)) {
+
+                $pagesArr = Mage::getModel('recommender/sync', Mage::app())->getAmountOfPages($storeId);
+                $this->getResponse()->setBody(json_encode(array_merge($pagesArr, ['timestamp' => $timestamp])));
+            } else {
+                Mage::helper('recommender/logger')->logError("Failed to authenticate the request");
+                $this->getResponse()->setBody("");
+            }
+        } catch (Exception $exception) {
+            Mage::helper('recommender/logger')->logCritical("controllers/RecommendationController->pagesAction() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            return null;
+        }
+    }
+
     /**
      * Method for triggering function that will send logs
      */
     public function logsAction()
     {
         try {
-            $url_hash = (string)$this->getRequest()->getParam('h');
+            $urlHash = (string)$this->getRequest()->getParam('h');
             $timestamp = $this->getRequest()->getParam('t');
 
-            if ($this->auth_api($url_hash)) {
+            if ($this->auth_api($urlHash)) {
                 $logs = Mage::getModel('recommender/logdispatcher')->sendLogs();
                 $this->getResponse()->setBody($timestamp . " " . (int)$logs->getResponse());
             } else {
